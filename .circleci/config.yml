@@ -31,9 +31,9 @@ jobs:
       - checkout
       - docker/check
       - docker/build:
-          image: jsdockery/education-spac
+          image: jsdockery/education-space
       - docker/push:
-          image: jsdockery/education-spac
+          image: jsdockery/education-space
 
 workflows:
   simple_workflow:
