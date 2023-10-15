@@ -35,13 +35,32 @@ jobs:
       - docker/push:
           image: jsdockery/education-space
 
+# workflows:
+#   simple_workflow:
+#     jobs:
+#       - build
+#       - test:
+#           requires:
+#             - build
+#       - build-and-push:
+#           requires:
+#             - test
+
+
+##conditions
 workflows:
   simple_workflow:
     jobs:
-      - build
-      - test:
-          requires:
+      - when:
+          condition: << pipeline.git.branch == 'main' >>
+          steps:
             - build
-      - build-and-push:
-          requires:
-            - test
+            - test:
+                requires:
+                  - build
+      - when:
+          condition: << pipeline.git.tag >>
+          steps:
+            - build-and-push:
+                parameters:
+                  tag: << pipeline.git.tag >>
