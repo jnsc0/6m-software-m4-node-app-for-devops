@@ -2,6 +2,7 @@ version: 2.1
 orbs:
   node: circleci/node@5.0.1
   docker: circleci/docker@2.1.4
+  snyk: snyk/snyk@1.5.0
 jobs:
   build:
     docker:
@@ -34,33 +35,49 @@ jobs:
           image: jsdockery/education-space
       - docker/push:
           image: jsdockery/education-space
+    scan:
+      docker:
+        -image: cimg/node:16:10
+      environment:
+        IMAGE_NAME: jsdockery/education-space #the image_name is a variable we could use in our jobs/steps
+      steps:
+        - checkout
+        - setup_remove_docker
+        - docker/check
+        - run: docker build -t $IMAGE_NAME .
+        #$IMAGE_NAME gets the value of the IMAGE_NAME from the environment defined above.
+        - snyk/scan:
+          docker-image-name: $IMAGE_NAME
 
-# workflows:
-#   simple_workflow:
-#     jobs:
-#       - build
-#       - test:
-#           requires:
-#             - build
-#       - build-and-push:
-#           requires:
-#             - test
-
-
-##conditions
 workflows:
   simple_workflow:
     jobs:
-      - when:
-          condition: << pipeline.git.branch == 'main' >>
-          steps:
+      - build
+      - test:
+          requires:
             - build
-            - test:
-                requires:
-                  - build
-      - when:
-          condition: << pipeline.git.tag >>
-          steps:
-            - build-and-push:
-                parameters:
-                  tag: << pipeline.git.tag >>
+      - build-and-push:
+          requires:
+            - test
+      - scan:
+          requires:
+            -build
+
+
+##conditions
+# workflows:
+#   simple_workflow:
+#     jobs:
+#       - when:
+#           condition: << pipeline.git.branch == 'main' >>
+#           steps:
+#             - build
+#             - test:
+#                 requires:
+#                   - build
+#       - when:
+#           condition: << pipeline.git.tag >>
+#           steps:
+#             - build-and-push:
+#                 parameters:
+#                   tag: << pipeline.git.tag >>
