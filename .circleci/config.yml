@@ -61,7 +61,7 @@ workflows:
             - test
       - scan:
           requires:
-            -build
+            - build
 
 
 ##conditions
