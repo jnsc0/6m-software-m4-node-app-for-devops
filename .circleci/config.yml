@@ -39,7 +39,7 @@ jobs:
     docker:
       - image: cimg/node:16:10
     environment:
-    IMAGE_NAME: jsdockery/education-space #the image_name is a variable we could use in our jobs/steps
+      IMAGE_NAME: jsdockery/education-space #the image_name is a variable we could use in our jobs/steps
     steps:
       - checkout
       - setup_remove_docker
